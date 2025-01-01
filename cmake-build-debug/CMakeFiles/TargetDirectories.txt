@@ -1,0 +1,3 @@
+C:/code/cpp/pe-x86-parser/cmake-build-debug/CMakeFiles/pe-x86-parser.dir
+C:/code/cpp/pe-x86-parser/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/code/cpp/pe-x86-parser/cmake-build-debug/CMakeFiles/rebuild_cache.dir
