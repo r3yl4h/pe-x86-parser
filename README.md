@@ -1,8 +1,7 @@
 PE-x86-parser
 ========
 
-
-This is a C++ project utilizing WinAPI that parses PE32 and PE64 files. While it may not be the most optimized version, I found it to be an engaging endeavor. You can operate the program by supplying arguments or running it without any, prompting you to input the file path for analysis.
+it's a small pe analyzer, it analyzes dos, nt and section header structures and can analyze imports/exports, relocation data etc
 
 ## dependancies
 you just need to have winapi, cmake and DIA SDK
@@ -18,9 +17,26 @@ and for dia you will just need to include the dia sdk include path to the cmakel
 
 ## for cli option
 ```
-Usage: Pe_x86_parser.exe <file(s)> <option(s)>
-Option:
-  -s  --symbols  For get the symbols
+Usage: ./pe-parser [OPTIONS]
+
+Options:
+  -all, --all              Activate all options.
+  -d, -dos, --dos_header   Parse the DOS header of the file.
+  -n, -nt, --nt_header     Parse the NT header of the file.
+  -o, --optional_header    Parse the Optional header of the file.
+  -e, edt, -export,
+      --export             Parse the Export table.
+  -i, iat, -import,
+      --import             Parse the Import Address Table.
+  -r, --reloc              Parse the Relocation table.
+  -s, --symbol             Parse the Symbol table.
+  -section, --section      Parse the Sections of the file.
+  -pdata, --pdata,
+      --except             Parse the Exception table.
+
+Examples:
+  ./pe-parser -all           Parse all available headers and tables.
+  ./pe-parser -d -n -o       Parse DOS, NT, and Optional headers.
 ```
 ## dos header
 ```
@@ -126,166 +142,31 @@ OPTIONAL HEADER64:
 ----------------------------------------------------------------------
 SECTION TABLE:
 
- Name: .text
-    VSize: 0x205c0 - Va: 0x1000
-    SizeOfRawData: 0x20600 - PtrToRawData: 0x600
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 60000060
+Name                VSize       VA          SizeOfRawData     PtrToRawData      PtrToReloc        Characteristics
+________________________________________________________________________________________________________________________
+.text             0x205c0     0x1000      0x20600           0x600             0                 0x60000060
+.data             0xa0        0x22000     0x200             0x20c00           0                 0xc0000040
+.rdata            0x518c      0x23000     0x5200            0x20e00           0                 0x40000040
+.pdata            0x10d4      0x29000     0x1200            0x26000           0                 0x40000040
+.xdata            0x12ec      0x2b000     0x1400            0x27200           0                 0x40000040
+.bss              0xb30       0x2d000     0                 0                 0                 0xc0000080
+.edata            0x72        0x2e000     0x200             0x28600           0                 0x40000040
+.idata            0xe10       0x2f000     0x1000            0x28800           0                 0xc0000040
+.CRT              0x58        0x30000     0x200             0x29800           0                 0xc0000040
+.tls              0x10        0x31000     0x200             0x29a00           0                 0xc0000040
+.reloc            0x914       0x32000     0xa00             0x29c00           0                 0x42000040
+.debug_aranges    0xa80       0x33000     0xc00             0x2a600           0                 0x42000040
+.debug_info       0x32b9d     0x34000     0x32c00           0x2b200           0                 0x42000040
+.debug_abbrev     0x4ebe      0x67000     0x5000            0x5de00           0                 0x42000040
+.debug_line       0x88f6      0x6c000     0x8a00            0x62e00           0                 0x42000040
+.debug_frame      0x25d8      0x75000     0x2600            0x6b800           0                 0x42000040
+.debug_str        0xcbc       0x78000     0xe00             0x6de00           0                 0x42000040
+.debug_line_str   0x28b6      0x79000     0x2a00            0x6ec00           0                 0x42000040
+.debug_loclists   0x7648      0x7c000     0x7800            0x71600           0                 0x42000040
+.debug_rnglists   0x8c2       0x84000     0xa00             0x78e00           0                 0x42000040
 
------------------------------------
- Name: .data
-    VSize: 0xa0 - Va: 0x22000
-    SizeOfRawData: 0x200 - PtrToRawData: 0x20c00
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: c0000040
 
------------------------------------
- Name: .rdata
-    VSize: 0x518c - Va: 0x23000
-    SizeOfRawData: 0x5200 - PtrToRawData: 0x20e00
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 40000040
-
------------------------------------
- Name: .pdata
-    VSize: 0x10d4 - Va: 0x29000
-    SizeOfRawData: 0x1200 - PtrToRawData: 0x26000
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 40000040
-
------------------------------------
- Name: .xdata
-    VSize: 0x12ec - Va: 0x2b000
-    SizeOfRawData: 0x1400 - PtrToRawData: 0x27200
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 40000040
-
------------------------------------
- Name: .bss
-    VSize: 0xb30 - Va: 0x2d000
-    SizeOfRawData: 0x0 - PtrToRawData: 0x0
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: c0000080
-
------------------------------------
- Name: .edata
-    VSize: 0x72 - Va: 0x2e000
-    SizeOfRawData: 0x200 - PtrToRawData: 0x28600
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 40000040
-
------------------------------------
- Name: .idata
-    VSize: 0xe10 - Va: 0x2f000
-    SizeOfRawData: 0x1000 - PtrToRawData: 0x28800
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: c0000040
-
------------------------------------
- Name: .CRT
-    VSize: 0x58 - Va: 0x30000
-    SizeOfRawData: 0x200 - PtrToRawData: 0x29800
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: c0000040
-
------------------------------------
- Name: .tls
-    VSize: 0x10 - Va: 0x31000
-    SizeOfRawData: 0x200 - PtrToRawData: 0x29a00
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: c0000040
-
------------------------------------
- Name: .reloc
-    VSize: 0x914 - Va: 0x32000
-    SizeOfRawData: 0xa00 - PtrToRawData: 0x29c00
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 42000040
-
------------------------------------
- Name: .debug_aranges
-    VSize: 0xa80 - Va: 0x33000
-    SizeOfRawData: 0xc00 - PtrToRawData: 0x2a600
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 42000040
-
------------------------------------
- Name: .debug_info
-    VSize: 0x32b9d - Va: 0x34000
-    SizeOfRawData: 0x32c00 - PtrToRawData: 0x2b200
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 42000040
-
------------------------------------
- Name: .debug_abbrev
-    VSize: 0x4ebe - Va: 0x67000
-    SizeOfRawData: 0x5000 - PtrToRawData: 0x5de00
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 42000040
-
------------------------------------
- Name: .debug_line
-    VSize: 0x88f6 - Va: 0x6c000
-    SizeOfRawData: 0x8a00 - PtrToRawData: 0x62e00
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 42000040
-
------------------------------------
- Name: .debug_frame
-    VSize: 0x25d8 - Va: 0x75000
-    SizeOfRawData: 0x2600 - PtrToRawData: 0x6b800
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 42000040
-
------------------------------------
- Name: .debug_str
-    VSize: 0xcbc - Va: 0x78000
-    SizeOfRawData: 0xe00 - PtrToRawData: 0x6de00
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 42000040
-
------------------------------------
- Name: .debug_line_str
-    VSize: 0x28b6 - Va: 0x79000
-    SizeOfRawData: 0x2a00 - PtrToRawData: 0x6ec00
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 42000040
-
------------------------------------
- Name: .debug_loclists
-    VSize: 0x7648 - Va: 0x7c000
-    SizeOfRawData: 0x7800 - PtrToRawData: 0x71600
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 42000040
-
------------------------------------
- Name: .debug_rnglists
-    VSize: 0x8c2 - Va: 0x84000
-    SizeOfRawData: 0xa00 - PtrToRawData: 0x78e00
-    PtrToReloc: 0x0 - PtrToLinenum: 0x0
-    NumberOfReloc: 0 - NumberOfLinenum: 0
-    Characteristics: 42000040
-
------------------------------------
+-------------------------------------------------------------------------------------------------
 ```
 ## Import Table:
 ```
